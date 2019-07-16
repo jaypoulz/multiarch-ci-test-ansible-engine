@@ -99,7 +99,8 @@ if [ "$test_type" == "$UPSTREAM_TESTSUITE" ]; then
     sed -ie s/2048/4096/ provision.fmf
 
     # Update reboot timeout for all_transistions
-    # sed -ie "s/timeout: 300/timeout: 3600/" /usr/share/ansible/roles/rhel-system-roles.selinux/tests/selinux_apply_reboot.yml
+    export TEST_DEBUG=1
+    sed -ie "s/timeout: 300/timeout: 7200/" /usr/share/ansible/roles/rhel-system-roles.selinux/tests/selinux_apply_reboot.yml
 fi
 
 # Define output
