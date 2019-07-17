@@ -9,7 +9,7 @@ properties(
             [
             $class: 'ActiveMQSubscriberProviderData',
             name: 'Red Hat UMB',
-            overrides: [topic: 'Consumer.rh-jenkins-ci-plugin.20a11492-54d6-4843-8894-24bd09c30048.VirtualTopic.eng.brew.>'],
+            overrides: [topic: 'Consumer.rh-jenkins-ci-plugin.974de4f8-8121-481e-a8d9-4c6d76b712e9.VirtualTopic.eng.brew.>'],
             selector: 'name = \'ansible\' AND type = \'Tag\' AND tag LIKE \'ansible-%-rhel-%-candidate\'',
             timeout: null
           ]
@@ -26,12 +26,12 @@ properties(
          regex: '^((all){1}|(?:x86_64|ppc64le|aarch64|s390x)(?:,\\s*(?:x86_64|ppc64le|aarch64|s390x))*)$'
         ],
         string(
-          defaultValue: 'https://github.com/redhat-multiarch-qe/multiarch-ci-libraries',
+          defaultValue: 'https://github.com/jaypoulz/multiarch-ci-libraries',
           description: 'Repo for shared libraries.',
           name: 'LIBRARIES_REPO'
         ),
         string(
-          defaultValue: 'v1.3.0',
+          defaultValue: 'dev-v1.3.1',
           description: 'Git reference to the branch or tag of shared libraries.',
           name: 'LIBRARIES_REF'
         ),
@@ -66,7 +66,7 @@ properties(
           name: 'RHEL7_DISTRO'
         ),
         string(
-          defaultValue: 'RHEL-8.0.0',
+          defaultValue: 'RHEL-8.1.0-20190717.n.0',
           description: 'RHEL 8 distribution.',
           name: 'RHEL8_DISTRO'
         ),
@@ -88,19 +88,19 @@ properties(
          regex: '^(basic-smoke-test|Upstream-testsuite|Multiarch-testsuite){1}$'
         ],
         [$class: 'ValidatingStringParameterDefinition',
-         defaultValue: 'basic-smoke-test',
+         defaultValue: 'Upstream-testsuite',
          description: 'Parameter describing which of the system-roles tests to run on RHEL 8. Valid values are=["basic-smoke-test", "Upstream-testsuite", "Multiarch-testsuite"]',
          failedValidationMessage: 'Invalid test name. Valid values are ["basic-smoke-test", "Upstream-testsuite", "Multiarch-testsuite"].',
          name: 'RHEL8_TEST_TYPE',
          regex: '^(basic-smoke-test|Upstream-testsuite|Multiarch-testsuite){1}$'
         ],
         string(
-          defaultValue: 'jpoulin; mclay; djez; pcahyna',
+          defaultValue: 'jpoulin',
           description: 'Semi-colon delimited list of email notification recipients.',
           name: 'RHEL7_EMAIL_SUBSCRIBERS'
         ),
         string(
-          defaultValue: 'jpoulin; mclay; djez; pcahyna',
+          defaultValue: 'jpoulin',
           description: 'Semi-colon delimited list of email notification recipients.',
           name: 'RHEL8_EMAIL_SUBSCRIBERS'
         ),
@@ -156,11 +156,11 @@ String variant = ''
 
 // Selected parameter set
 String systemRolesOverride = ''
-String testType = ''
+String testTypeDefault = ''
 String emailSubscribers = ''
 
 final Map<String,List<String>> SUPPORTED_ARCHES = [
-  (RHEL7): [X86_64, PPC64LE],
+  (RHEL7): [X86_64, PPC64LE, S390X],
   (RHEL8): [X86_64, PPC64LE, AARCH64, S390X]
 ]
 
@@ -215,13 +215,13 @@ if (os == RHEL8) {
   distro = params.RHEL8_DISTRO
   variant = 'BaseOS'
   systemRolesOverride = params.RHEL8_SYSTEM_ROLES_OVERRIDE
-  testType = params.RHEL8_TEST_TYPE
+  testTypeDefault = params.RHEL8_TEST_TYPE
   emailSubscribers = params.RHEL8_EMAIL_SUBSCRIBERS
 } else {
   distro = params.RHEL7_DISTRO
   variant = 'Server'
   systemRolesOverride = params.RHEL7_SYSTEM_ROLES_OVERRIDE
-  testType = params.RHEL7_TEST_TYPE
+  testTypeDefault = params.RHEL7_TEST_TYPE
   emailSubscribers = params.RHEL7_EMAIL_SUBSCRIBERS
 }
 
@@ -230,13 +230,11 @@ if (!distro) {
    error("Distro for selected os ($os) cannot be null.")
 }
 
-// Ensure workspace is grabbed from test repo when we need beaker multi-resource
-if (testType == MULTIARCH_TESTSUITE) {
-  config.provisioningRepoUrl = null
-}
-
 def targetHosts = []
 for (String arch in arches) {
+  // Manually override testType for s390x since kvm on zVM has poor performance
+  String testType = arch == S390X ? MULTIARCH_TESTSUITE : testTypeDefault 
+
   def targetHost = MAQEAPI.v1.newTargetHost()
   targetHost.name = arch
   targetHost.arch = arch
@@ -250,6 +248,7 @@ for (String arch in arches) {
   if (os == RHEL8) {
     targetHost.inventoryVars << [ ansible_python_interpreter:'/usr/libexec/platform-python' ]
   }
+  targetHost.bkrCount = testType == MULTIARCH_TESTSUITE ? 2 : 1
 
   if (testType == UPSTREAM_TESTSUITE) {
     // Ensure there is enough memory to run KVM
