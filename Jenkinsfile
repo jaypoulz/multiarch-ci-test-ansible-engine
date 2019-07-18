@@ -81,14 +81,14 @@ properties(
           name: 'RHEL8_SYSTEM_ROLES_OVERRIDE'
         ),
         [$class: 'ValidatingStringParameterDefinition',
-         defaultValue: 'Upstream-testsuite',
+         defaultValue: 'basic-smoke-test',
          description: 'Parameter describing which of the system-roles tests to run on RHEL 7. Valid values are=["basic-smoke-test", "Upstream-testsuite", "Multiarch-testsuite"]',
          failedValidationMessage: 'Invalid test name. Valid values are ["basic-smoke-test", "Upstream-testsuite", "Multiarch-testsuite"].',
          name: 'RHEL7_TEST_TYPE',
          regex: '^(basic-smoke-test|Upstream-testsuite|Multiarch-testsuite){1}$'
         ],
         [$class: 'ValidatingStringParameterDefinition',
-         defaultValue: 'Upstream-testsuite',
+         defaultValue: 'basic-smoke-test',
          description: 'Parameter describing which of the system-roles tests to run on RHEL 8. Valid values are=["basic-smoke-test", "Upstream-testsuite", "Multiarch-testsuite"]',
          failedValidationMessage: 'Invalid test name. Valid values are ["basic-smoke-test", "Upstream-testsuite", "Multiarch-testsuite"].',
          name: 'RHEL8_TEST_TYPE',
