@@ -156,7 +156,7 @@ String variant = ''
 
 // Selected parameter set
 String systemRolesOverride = ''
-String testTypeDefault = ''
+String testType = ''
 String emailSubscribers = ''
 
 final Map<String,List<String>> SUPPORTED_ARCHES = [
@@ -215,13 +215,13 @@ if (os == RHEL8) {
   distro = params.RHEL8_DISTRO
   variant = 'BaseOS'
   systemRolesOverride = params.RHEL8_SYSTEM_ROLES_OVERRIDE
-  testTypeDefault = params.RHEL8_TEST_TYPE
+  testType = params.RHEL8_TEST_TYPE
   emailSubscribers = params.RHEL8_EMAIL_SUBSCRIBERS
 } else {
   distro = params.RHEL7_DISTRO
   variant = 'Server'
   systemRolesOverride = params.RHEL7_SYSTEM_ROLES_OVERRIDE
-  testTypeDefault = params.RHEL7_TEST_TYPE
+  testType = params.RHEL7_TEST_TYPE
   emailSubscribers = params.RHEL7_EMAIL_SUBSCRIBERS
 }
 
@@ -232,9 +232,6 @@ if (!distro) {
 
 def targetHosts = []
 for (String arch in arches) {
-  // Manually override testType for s390x since kvm on zVM has poor performance
-  String testType = arch == S390X ? MULTIARCH_TESTSUITE : testTypeDefault 
-
   def targetHost = MAQEAPI.v1.newTargetHost()
   targetHost.name = arch
   targetHost.arch = arch
