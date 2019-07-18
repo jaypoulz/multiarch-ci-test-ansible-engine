@@ -1,2 +1,1 @@
 qemu-kvm
-selinux/tests_all_transitions.yml

@@ -58,7 +58,6 @@ sudo yum install -y wget qemu-kvm genisoimage \
     rhel-system-roles \
     koji brewkoji \
     beakerlib beakerlib-redhat
-# restraint-rhts
 
 # Override system roles if requested
 RHEL_SYSTEM_ROLES_OVERRIDE=$2

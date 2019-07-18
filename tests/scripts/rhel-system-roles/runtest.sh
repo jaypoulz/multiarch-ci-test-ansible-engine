@@ -97,7 +97,7 @@ rlJournalStart
             # SYSTEM_ROLES_ONLY_TESTS=network/tests_bridge.yml -> Run only tests_bridge.yml from network role
             if echo "${testname}" | egrep -qe "$(echo "${SYSTEM_ROLES_ONLY_TESTS}" | tr " " "|")"
             then
-                rlRun "ansible-playbook -vvv -i /usr/share/ansible/inventory/target -l target_node $PLAYBOOK &> $LOGFILE" 0 "Test $testname ($PLAYBOOK) with ANSIBLE-$ANSIBLE_VER"
+                rlRun "ansible-playbook -i /usr/share/ansible/inventory/target -l target_node $PLAYBOOK &> $LOGFILE" 0 "Test $testname ($PLAYBOOK) with ANSIBLE-$ANSIBLE_VER"
                 rlFileSubmit "$LOGFILE"
             fi
         done
