@@ -66,7 +66,7 @@ properties(
           name: 'RHEL7_DISTRO'
         ),
         string(
-          defaultValue: 'RHEL-8.1.0-20190717.n.0',
+          defaultValue: 'RHEL-8.0.0',
           description: 'RHEL 8 distribution.',
           name: 'RHEL8_DISTRO'
         ),
