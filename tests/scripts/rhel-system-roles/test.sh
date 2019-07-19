@@ -24,7 +24,8 @@ OS_MAJOR_VERSION=$(echo $VERSION_ID | cut -d '.' -f 1)
 
 # Ensure test libs are installed
 sudo yum install -y yum-utils
-sudo yum-config-manager --add-repo https://beaker.engineering.redhat.com/rpms/
+sudo yum-config-manager --add-repo https://beaker.engineering.redhat.com/rpms/ &&
+    sudo yum-config-manager --save --setopt=beaker.engineering.redhat.com_rpms_.sslverify=false
 sudo yum install -y --nogpgcheck \
     distribution-distribution-Library-RpmSnapshot \
     distribution-distribution-Library-epel \
